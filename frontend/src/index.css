@@ -1,0 +1,28 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #0A0E1A;     /* Deep Navy */
+  --color-secondary: #00D4FF;   /* Electric Blue */
+  --color-accent: #FF8C00;      /* Amber Accent */
+  
+  --font-sans: "DM Sans", sans-serif;
+  --font-mono: "Space Mono", monospace;
+}
+
+@layer base {
+  body {
+    @apply bg-primary text-white font-sans antialiased;
+    background-color: var(--color-primary);
+    color: white;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-bold;
+  }
+}
+
+@layer utilities {
+  .glass-card {
+    @apply bg-primary/40 backdrop-blur-md border border-white/10 rounded-2xl shadow-xl;
+  }
+}
