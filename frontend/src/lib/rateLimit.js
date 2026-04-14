@@ -32,6 +32,13 @@ class TokenBucket {
 const AI_BUCKET = new TokenBucket(10, 10); // 10 per min
 const LOCATION_BUCKET = new TokenBucket(60, 60); // 1 per sec (60/min)
 
+export const resetRateLimits = () => {
+  AI_BUCKET.tokens = AI_BUCKET.capacity;
+  AI_BUCKET.lastRefill = Date.now();
+  LOCATION_BUCKET.tokens = LOCATION_BUCKET.capacity;
+  LOCATION_BUCKET.lastRefill = Date.now();
+};
+
 export const checkRateLimit = (type) => {
   switch (type) {
     case 'AI_QUERY':

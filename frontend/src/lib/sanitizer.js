@@ -41,5 +41,5 @@ export const validateCoordinates = (lat, lng) => {
 export const sanitizeQuery = (query) => {
   const clean = sanitizeInput(query).trim();
   // Remove common SQL injection indicators or risky tokens
-  return clean.replace(/(\b(SELECT|INSERT|UPDATE|DELETE|DROP|UNION)\b)|[*;]|--/gi, '');
+  return clean.replace(/(\b(SELECT|INSERT|UPDATE|DELETE|DROP|UNION|OR|AND|XP_|EXECUTE|DECLARE|CAST|CONVERT)\b)|[*;]|--|['"]/gi, '');
 };

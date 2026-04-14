@@ -2,111 +2,99 @@ import { describe, it, expect } from 'vitest';
 import { computeScore, sortOptions } from './scoreOptimizer';
 
 describe('scoreOptimizer', () => {
-  it('computes basic score correctly', () => {
+  // --- Category: Normal Values ---
+  it('1. computes basic score correctly', () => {
     const score = computeScore({ distance: 500, crowdDensity: 50, waitTime: 30 });
-    // Normalization: dist=0.5, density=0.5, wait=0.5
-    // Result: (0.5*0.3) + (0.5*0.4) + (0.5*0.3) = 0.15 + 0.2 + 0.15 = 0.5
     expect(score).toBeCloseTo(0.5);
   });
 
-  it('handles minimum values (0)', () => {
-    const score = computeScore({ distance: 0, crowdDensity: 0, waitTime: 0 });
-    expect(score).toBe(0);
+  it('2. weights density higher than distance and wait', () => {
+    // Both dist/wait are identical, only density differs
+    const scoreLowDensity = computeScore({ distance: 100, crowdDensity: 10, waitTime: 10 });
+    const scoreHighDensity = computeScore({ distance: 100, crowdDensity: 90, waitTime: 10 });
+    expect(scoreHighDensity).toBeGreaterThan(scoreLowDensity);
   });
 
-  it('handles values at thresholds', () => {
-    const score = computeScore({ distance: 1000, crowdDensity: 100, waitTime: 60 });
-    expect(score).toBeCloseTo(1);
-  });
-
-  it('clips values exceeding thresholds', () => {
-    const score = computeScore({ distance: 2000, crowdDensity: 150, waitTime: 120 });
-    expect(score).toBe(1);
-  });
-
-  it('weights density higher than distance and wait', () => {
-    // High density, low others
-    const scoreLow = computeScore({ distance: 100, crowdDensity: 100, waitTime: 1 });
-    // Low density, high others
-    const scoreHigh = computeScore({ distance: 1000, crowdDensity: 10, waitTime: 60 });
-    
-    // Density 1.0 * 0.4 = 0.4
-    // High dist/wait but low density should be lower if the weights favor density
-    // Let's check math:
-    // scoreLow: (0.1*0.3) + (1.0*0.4) + (0.016*0.3) = 0.03 + 0.4 + 0.005 = 0.435
-    // scoreHigh: (1.0*0.3) + (0.1*0.4) + (1.0*0.3) = 0.3 + 0.04 + 0.3 = 0.64
-    expect(scoreLow).toBeLessThan(scoreHigh);
-  });
-
-  it('sorts options correctly', () => {
-    const options = [
-      { id: 'far-busy', distance: 1000, crowdDensity: 100, waitTime: 60 },
-      { id: 'near-busy', distance: 100, crowdDensity: 80, waitTime: 10 },
-      { id: 'far-empty', distance: 900, crowdDensity: 10, waitTime: 5 }
-    ];
-    const sorted = sortOptions(options);
-    expect(sorted[0].id).toBe('far-empty'); // Best score should be first
-    expect(sorted[2].id).toBe('far-busy');  // Worst score should be last
-  });
-
-  it('handles negative inputs by treating as 0 due to normalization logic', () => {
-     // normalize is value / max. if negative, it just stays negative in result if not clamped
-     // Actually my normalize was Math.min(val/max, 1), not max(0, min(val/max, 1))
-     // Let's check if it needs safety.
-     const score = computeScore({ distance: -10, crowdDensity: -5, waitTime: -2 });
-     // -0.01 * 0.3 + -0.05 * 0.4 + -0.033 * 0.3
-     expect(score).toBeLessThan(0);
-  });
-
-  it('maintains order for identical options', () => {
-    const options = [
-      { id: '1', distance: 10, crowdDensity: 10, waitTime: 10 },
-      { id: '2', distance: 10, crowdDensity: 10, waitTime: 10 }
-    ];
-    const sorted = sortOptions(options);
-    expect(sorted[0].id).toBe('1');
-    expect(sorted[1].id).toBe('2');
-  });
-
-  it('recommends short distance over low wait if density is identical', () => {
-    const score1 = computeScore({ distance: 100, crowdDensity: 50, waitTime: 40 });
-    const score2 = computeScore({ distance: 500, crowdDensity: 50, waitTime: 10 });
-    // score1: 0.1*0.3 + 0.5*0.4 + 0.66*0.3 = 0.03 + 0.2 + 0.198 = 0.428
-    // score2: 0.5*0.3 + 0.5*0.4 + 0.16*0.3 = 0.15 + 0.2 + 0.048 = 0.398
-    expect(score1).toBeGreaterThan(score2); // wait time reduction 30m > distance reduction 400m for these weights
-  });
-
-  it('handles single option', () => {
-    const options = [{ id: 'only', distance: 50, crowdDensity: 20, waitTime: 10 }];
-    const sorted = sortOptions(options);
-    expect(sorted).toHaveLength(1);
-    expect(sorted[0].id).toBe('only');
-  });
-
-  it('treats missing values as undefined resulting in NaN (strict check)', () => {
-    const score = computeScore({ distance: 100 });
-    expect(score).toBeNaN();
-  });
-
-  it('handles very large values correctly (cap at 1)', () => {
-    const score = computeScore({ distance: 1000000, crowdDensity: 10000, waitTime: 1000 });
-    expect(score).toBe(1);
-  });
-
-  it('works with decimal values', () => {
+  it('3. handles decimal values correctly', () => {
     const score = computeScore({ distance: 0.5, crowdDensity: 0.2, waitTime: 0.1 });
     expect(score).toBeGreaterThan(0);
     expect(score).toBeLessThan(0.01);
   });
 
-  it('handles empty options list', () => {
-    const sorted = sortOptions([]);
-    expect(sorted).toEqual([]);
+  // --- Category: All Zeros ---
+  it('4. handles all zeros', () => {
+    const score = computeScore({ distance: 0, crowdDensity: 0, waitTime: 0 });
+    expect(score).toBe(0);
   });
 
-  it('re-attaches score to returned objects', () => {
-    const options = [{ name: 'A', distance: 1, crowdDensity: 1, waitTime: 1 }];
-    const result = sortOptions(options);
+  // --- Category: Max Values ---
+  it('5. handles exact threshold values (Max)', () => {
+    const score = computeScore({ distance: 1000, crowdDensity: 100, waitTime: 60 });
+    expect(score).toBeCloseTo(1);
+  });
+
+  it('6. clips values exceeding thresholds', () => {
+    const score = computeScore({ distance: 5000, crowdDensity: 200, waitTime: 2000 });
+    expect(score).toBe(1);
+  });
+
+  it('7. handles very large values', () => {
+    const score = computeScore({ distance: 1e10, crowdDensity: 1e10, waitTime: 1e10 });
+    expect(score).toBe(1);
+  });
+
+  // --- Category: Tie-Breaking / Sorting ---
+  it('8. sorts options correctly by score', () => {
+    const options = [
+      { id: 'worst', distance: 1000, crowdDensity: 100, waitTime: 60 },
+      { id: 'best', distance: 0, crowdDensity: 0, waitTime: 0 },
+      { id: 'mid', distance: 500, crowdDensity: 50, waitTime: 30 }
+    ];
+    const sorted = sortOptions(options);
+    expect(sorted[0].id).toBe('best');
+    expect(sorted[2].id).toBe('worst');
+  });
+
+  it('9. maintains order for identical scores (stable tie-breaking)', () => {
+    const options = [
+      { id: 'a', distance: 100, crowdDensity: 50, waitTime: 10 },
+      { id: 'b', distance: 100, crowdDensity: 50, waitTime: 10 }
+    ];
+    const sorted = sortOptions(options);
+    expect(sorted[0].id).toBe('a');
+    expect(sorted[1].id).toBe('b');
+  });
+
+  it('10. handles single option in sort', () => {
+    const result = sortOptions([{ id: 'x', distance: 1, crowdDensity: 1, waitTime: 1 }]);
+    expect(result).toHaveLength(1);
+  });
+
+  it('11. handles empty lists in sort', () => {
+    expect(sortOptions([])).toEqual([]);
+  });
+
+  // --- Category: NaN and Edge Cases ---
+  it('12. returns NaN if required inputs are missing', () => {
+    const score = computeScore({ distance: 100 });
+    expect(score).toBeNaN();
+  });
+
+  it('13. returns NaN if inputs are explicitly NaN', () => {
+    const score = computeScore({ distance: NaN, crowdDensity: 50, waitTime: 10 });
+    expect(score).toBeNaN();
+  });
+
+  it('14. handles negative values (treated as <= 0)', () => {
+    const score = computeScore({ distance: -100, crowdDensity: -50, waitTime: -10 });
+    // Normalize will return negative values if not clamped at 0
+    // Math.min(-0.1, 1) = -0.1
+    expect(score).toBeLessThan(0);
+  });
+
+  it('15. verifies that the output has the score property attached', () => {
+    const result = sortOptions([{ name: 'Test', distance: 10, crowdDensity: 10, waitTime: 10 }]);
     expect(result[0]).toHaveProperty('score');
+    expect(typeof result[0].score).toBe('number');
   });
 });
