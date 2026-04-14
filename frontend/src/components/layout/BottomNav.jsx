@@ -1,4 +1,3 @@
-import React from 'react';
 import { Home, Map as MapIcon, MessageSquare, DoorOpen, Bell } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 

@@ -3,6 +3,7 @@ import globals from 'globals';
 import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
 import jsxA11y from 'eslint-plugin-jsx-a11y';
+import react from 'eslint-plugin-react';
 
 export default [
   { ignores: ['dist'] },
@@ -17,20 +18,30 @@ export default [
         sourceType: 'module',
       },
     },
+    settings: {
+      react: { version: 'detect' },
+    },
     plugins: {
+      'react': react,
       'react-hooks': reactHooks,
       'react-refresh': reactRefresh,
       'jsx-a11y': jsxA11y,
     },
     rules: {
       ...js.configs.recommended.rules,
+      ...react.configs.recommended.rules,
+      ...react.configs['jsx-runtime'].rules,
       ...reactHooks.configs.recommended.rules,
       ...jsxA11y.configs.recommended.rules,
       'react-refresh/only-export-components': [
         'warn',
         { allowConstantExport: true },
       ],
-      // Airbnb like rules basics (simulated without immense dependency overhead in flat config)
+      'react/prop-types': 'off',
+      'no-unused-vars': 'warn',
+      'no-undef': 'warn',
+      'react-hooks/rules-of-hooks': 'error',
+      'react-hooks/exhaustive-deps': 'warn',
       'no-var': 'error',
       'prefer-const': 'error',
       'eqeqeq': 'error',

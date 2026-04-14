@@ -75,5 +75,19 @@ describe('sanitizer utility', () => {
     it('rejects coordinates on the moon', () => {
       expect(validateCoordinates(100, 200)).toBe(false);
     });
+
+    it('rejects non-numeric coordinates', () => {
+      expect(validateCoordinates('abc', 'def')).toBe(false);
+      expect(validateCoordinates(37.77, 'invalid')).toBe(false);
+    });
+  });
+
+  describe('edge cases', () => {
+    it('returns empty string for non-string input in sanitizeInput', () => {
+      expect(sanitizeInput(null)).toBe('');
+      expect(sanitizeInput(undefined)).toBe('');
+      expect(sanitizeInput(123)).toBe('');
+      expect(sanitizeInput({})).toBe('');
+    });
   });
 });

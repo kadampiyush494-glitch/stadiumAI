@@ -1,4 +1,4 @@
-import React from 'react';
+import { forwardRef } from 'react';
 import PropTypes from 'prop-types';
 import { cn } from './Button';
 
@@ -7,9 +7,9 @@ import { cn } from './Button';
  * @param {Object} props
  * @param {string} [props.className]
  * @param {string} [props.type='text']
- * @returns {React.ReactElement}
+ * @returns {JSX.Element}
  */
-const Input = React.forwardRef(({ className, type = 'text', ...props }, ref) => {
+const Input = forwardRef(({ className, type = 'text', ...props }, ref) => {
   return (
     <input
       type={type}

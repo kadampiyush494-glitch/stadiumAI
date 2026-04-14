@@ -1,4 +1,3 @@
-import React from 'react';
 
 export default function DensityCircle({ percentage, size = 60 }) {
   const radius = size * 0.4;

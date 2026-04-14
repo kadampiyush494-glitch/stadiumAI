@@ -1,4 +1,3 @@
-import React from 'react';
 
 export const Skeleton = ({ className = '', variant = 'rect' }) => {
   const baseClasses = "shimmer bg-white/5";

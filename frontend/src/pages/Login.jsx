@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import GlassCard from '../components/ui/GlassCard';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
@@ -37,8 +37,9 @@ export function Login() {
 
         <form onSubmit={handleLogin} className="space-y-6">
           <div className="space-y-2">
-            <label className="text-[10px] font-black uppercase tracking-widest text-slate-300 ml-1">Terminal ID (Email)</label>
+            <label htmlFor="terminal-id" className="text-[10px] font-black uppercase tracking-widest text-slate-300 ml-1">Terminal ID (Email)</label>
             <Input 
+              id="terminal-id"
               type="email" 
               value={email} 
               onChange={e => setEmail(e.target.value)} 
@@ -48,8 +49,9 @@ export function Login() {
             />
           </div>
           <div className="space-y-2">
-            <label className="text-[10px] font-black uppercase tracking-widest text-slate-300 ml-1">Secure Key (Password)</label>
+            <label htmlFor="secure-key" className="text-[10px] font-black uppercase tracking-widest text-slate-300 ml-1">Secure Key (Password)</label>
             <Input 
+              id="secure-key"
               type="password" 
               value={password} 
               onChange={e => setPassword(e.target.value)} 

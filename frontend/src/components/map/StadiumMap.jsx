@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, useMemo } from 'react';
+import { useRef, useEffect, useState, useMemo } from "react";
 import PropTypes from 'prop-types';
 import { useGoogleMaps } from '../../hooks/useGoogleMaps';
 import { collection, onSnapshot, query } from 'firebase/firestore';
@@ -71,8 +71,6 @@ export default function StadiumMap({ onRouteAnnounce }) {
         'rgba(255, 0, 0, 1)'
       ] // Futuristic thermal look
     });
-    setHeatmapLayer(newHeatmap);
-
     // 6. Initialize DirectionsRenderer
     const renderer = new coreApi.maps.DirectionsRenderer({
       map: map,
@@ -83,7 +81,11 @@ export default function StadiumMap({ onRouteAnnounce }) {
         strokeWeight: 5,
       }
     });
-    setDirectionsRenderer(renderer);
+
+    Promise.resolve().then(() => {
+      setHeatmapLayer(newHeatmap);
+      setDirectionsRenderer(renderer);
+    });
 
     const infoWindow = new coreApi.maps.InfoWindow();
 
@@ -275,10 +277,25 @@ export default function StadiumMap({ onRouteAnnounce }) {
       <div
         ref={mapRef}
         className="w-full h-full"
-        role="application"
+        role="region"
         aria-label="Interactive Stadium Map with real-time crowd heatmaps"
-        tabIndex="0"
       />
+
+      {/* Facility Quick Navigation */}
+      <div className="absolute bottom-6 left-6 right-6 flex space-x-2 pointer-events-none">
+        <button 
+           onClick={() => calculateRoute(STADIUM_CENTER, { lat: 37.7750, lng: -122.4190 })}
+           className="px-4 py-2 bg-slate-900/90 text-white rounded-xl border border-white/10 shadow-lg text-[10px] font-black uppercase tracking-widest hover:bg-slate-800 transition-all pointer-events-auto"
+        >
+           Calculate Route to Burger Stand
+        </button>
+        <button 
+           onClick={() => calculateRoute(STADIUM_CENTER, { lat: 37.7748, lng: -122.4196 })}
+           className="px-4 py-2 bg-slate-900/90 text-white rounded-xl border border-white/10 shadow-lg text-[10px] font-black uppercase tracking-widest hover:bg-slate-800 transition-all pointer-events-auto"
+        >
+           Route to Restroom
+        </button>
+      </div>
     </div>
   );
 }

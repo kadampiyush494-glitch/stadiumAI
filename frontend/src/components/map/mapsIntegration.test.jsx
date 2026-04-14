@@ -19,19 +19,32 @@ describe('Maps Integration', () => {
     maps: {
       LatLng: vi.fn(item => item),
       visualization: {
-        HeatmapLayer: vi.fn(() => ({
-          setData: vi.fn(),
-          setMap: vi.fn(),
-        }))
+        HeatmapLayer: vi.fn().mockImplementation(function() {
+          this.setData = vi.fn();
+          this.setMap = vi.fn();
+          return this;
+        })
       },
-      DirectionsService: vi.fn(() => ({
-        route: vi.fn((req, cb) => cb({ routes: [] }, 'OK'))
-      })),
-      DirectionsRenderer: vi.fn(() => ({
-        setMap: vi.fn(),
-        setDirections: vi.fn(),
-      })),
-      TravelMode: { WALKING: 'WALKING' }
+      DirectionsService: vi.fn().mockImplementation(function() {
+        this.route = vi.fn((req, cb) => cb({ routes: [] }, 'OK'));
+        return this;
+      }),
+      DirectionsRenderer: vi.fn().mockImplementation(function() {
+        this.setMap = vi.fn();
+        this.setDirections = vi.fn();
+        return this;
+      }),
+      TravelMode: { WALKING: 'WALKING' },
+      Marker: vi.fn().mockImplementation(function() {
+        this.addListener = vi.fn();
+        return this;
+      }),
+      InfoWindow: vi.fn().mockImplementation(function() {
+        this.setContent = vi.fn();
+        this.open = vi.fn();
+        return this;
+      }),
+      SymbolPath: { CIRCLE: 0 }
     }
   };
 

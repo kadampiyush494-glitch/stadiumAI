@@ -1,8 +1,7 @@
 import { render } from '@testing-library/react';
 import * as matchers from 'vitest-axe';
 import { axe } from 'vitest-axe';
-import { expect, test, vi, beforeEach } from 'vitest';
-import React from 'react';
+import { expect, test, vi } from 'vitest';
 import { BrowserRouter } from 'react-router-dom';
 import { Layout } from '../components/layout/Layout';
 
@@ -16,11 +15,11 @@ vi.mock('@googlemaps/js-api-loader', () => ({
 }));
 
 test('Layout should have no accessibility violations', async () => {
-  global.ResizeObserver = vi.fn().mockImplementation(() => ({
+  vi.stubGlobal('ResizeObserver', vi.fn().mockImplementation(() => ({
     observe: vi.fn(),
     unobserve: vi.fn(),
     disconnect: vi.fn(),
-  }));
+  })));
 
   const { container } = render(
     <BrowserRouter>

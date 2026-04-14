@@ -1,10 +1,13 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from "react";
 import { Mic, MicOff } from 'lucide-react';
 import PropTypes from 'prop-types';
 
 export default function VoiceInput({ onSpeechResult }) {
   const [isListening, setIsListening] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState(() => {
+    const SpeechRecognition = typeof window !== 'undefined' && (window.SpeechRecognition || window.webkitSpeechRecognition);
+    return !SpeechRecognition ? 'Web Speech API is not supported in this browser.' : null;
+  });
   const recognitionRef = useRef(null);
 
   useEffect(() => {
@@ -37,9 +40,8 @@ export default function VoiceInput({ onSpeechResult }) {
       };
 
       recognitionRef.current = recognition;
-    } else {
-      setError('Web Speech API is not supported in this browser.');
     }
+    // setError in state initializer handles the unsupported case
 
     return () => {
       if (recognitionRef.current) {

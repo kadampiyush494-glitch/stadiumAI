@@ -11,7 +11,6 @@ test.describe('OmniFlow Accessibility Journey', () => {
     await page.keyboard.press('Enter');
     
     // Ensure focus moved to main content
-    const mainContent = page.locator('#main-content');
     // await expect(mainContent).toBeFocused(); // If tabIndex -1 is set properly
 
     // 2. Map Landmarks

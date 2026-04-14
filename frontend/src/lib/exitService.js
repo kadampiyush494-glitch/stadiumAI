@@ -1,5 +1,4 @@
-import { collection, doc, onSnapshot } from 'firebase/firestore';
-import { db } from './firebase';
+
 
 /**
  * Scoring logic for exit gates.

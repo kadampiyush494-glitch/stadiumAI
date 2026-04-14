@@ -40,9 +40,6 @@ describe('RoutingService', () => {
   });
 
   it('updates route dynamically based on density change', () => {
-    const density1 = { 'C': 10 }; // A-B-C-E is shorter (or equal distance)
-    const path1 = RoutingService.findPath('A', 'E', MOCK_GRAPH, density1);
-    
     // Now make C very crowded (but not blocked) and D very empty
     const density2 = { 'C': 80, 'D': 0 };
     const path2 = RoutingService.findPath('A', 'E', MOCK_GRAPH, density2);
@@ -55,5 +52,28 @@ describe('RoutingService', () => {
 
   it('returns null for non-existent nodes', () => {
     expect(RoutingService.findPath('A', 'Z', MOCK_GRAPH)).toBeNull();
+  });
+
+  it('handles complex graph with multiple paths and re-visiting open nodes', () => {
+    const complexGraph = {
+      nodes: {
+        'S': { x: 0, y: 0 },
+        'X': { x: 1, y: 0 },
+        'Y': { x: 0, y: 1 },
+        'G': { x: 1, y: 1 }
+      },
+      edges: [
+        { from: 'S', to: 'X', weight: 5 },
+        { from: 'S', to: 'Y', weight: 1 },
+        { from: 'Y', to: 'X', weight: 1 },
+        { from: 'X', to: 'G', weight: 1 },
+        { from: 'Y', to: 'G', weight: 5 }
+      ]
+    };
+    // S->Y->X->G = 1 + 1 + 1 = 3
+    // S->X->G = 5 + 1 = 6
+    // S->Y->G = 1 + 5 = 6
+    const path = RoutingService.findPath('S', 'G', complexGraph);
+    expect(path).toEqual(['S', 'Y', 'X', 'G']);
   });
 });

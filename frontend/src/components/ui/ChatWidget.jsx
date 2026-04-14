@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from "react";
 import { MessageSquare, X, Send } from 'lucide-react';
 import { callAssistant } from '../../lib/aiService';
 import VoiceInput from './VoiceInput';

@@ -77,7 +77,7 @@ describe('Notification Triggers (logic simulation)', () => {
   
   it('triggers reroute if recommended gate becomes congested', () => {
     const mockNotify = vi.fn();
-    let currentPlan = { recommendedGate: { id: 1, crowdLevel: 20 } };
+    const currentPlan = { recommendedGate: { id: 1, crowdLevel: 20 } };
     
     // Simulate gate update
     const updatedGate = { id: 1, crowdLevel: 85 }; // Congestion spike

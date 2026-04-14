@@ -1,5 +1,6 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { calculateGrowthRate, queueService } from './queueService';
+import { onSnapshot } from 'firebase/firestore';
 
 // Mock Firestore
 vi.mock('firebase/firestore', () => ({
@@ -49,5 +50,27 @@ describe('queueService', () => {
   it('returns empty array if inputs are missing', () => {
     expect(queueService.getBestOptions(null, {})).toEqual([]);
     expect(queueService.getBestOptions([], null)).toEqual([]);
+  });
+
+  it('sets up real-time listener for queues', () => {
+    const callback = vi.fn();
+    
+    // In vitest-mocked modules, functions are already mocks
+    onSnapshot.mockImplementation((query, cb) => {
+      cb({
+        docs: [
+          { id: '1', data: () => ({ name: 'Food A', category: 'food' }) },
+          { id: '2', data: () => ({ name: 'Food B', category: 'other' }) }
+        ]
+      });
+      return () => {}; // Unsubscribe
+    });
+
+    queueService.listenToQueues('food', callback);
+    
+    expect(onSnapshot).toHaveBeenCalled();
+    expect(callback).toHaveBeenCalledWith([
+      { id: '1', name: 'Food A', category: 'food' }
+    ]);
   });
 });

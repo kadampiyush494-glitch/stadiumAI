@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import GlassCard from '../components/ui/GlassCard';
 import StadiumMap from '../components/map/StadiumMap';
 import RealtimeTicker from '../components/ui/RealtimeTicker';
 import DensityCircle, { GateStatus } from '../components/ui/Indicators';
 import { CardSkeleton } from '../components/ui/Skeleton';
-import { Zap, MapPin, Users, Navigation } from 'lucide-react';
+import { Zap, Users, Navigation } from 'lucide-react';
 
 export function Dashboard() {
   const [loading, setLoading] = useState(true);

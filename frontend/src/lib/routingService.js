@@ -31,7 +31,7 @@ export class RoutingService {
 
     while (openSet.length > 0) {
       // Get node in openSet with lowest fScore
-      let current = openSet.reduce((a, b) => fScore[a] < fScore[b] ? a : b);
+      const current = openSet.reduce((a, b) => fScore[a] < fScore[b] ? a : b);
 
       if (current === goal) {
         return this._reconstructPath(cameFrom, current);

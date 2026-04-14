@@ -1,13 +1,34 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { db } from '../lib/firebase';
+import { describe, it, expect, vi } from 'vitest';
+import { db } from './firebase';
 import { 
   collection, 
-  addDoc, 
-  getDocs, 
-  query, 
-  where,
-  connectFirestoreEmulator 
+  addDoc,
+  getDocs,
+  query,
+  where
 } from 'firebase/firestore';
+
+// Mock firebase
+vi.mock('firebase/firestore', () => ({
+    getFirestore: vi.fn(),
+    collection: vi.fn(),
+    onSnapshot: vi.fn((coll, cb) => {
+        cb({
+            docs: [{ id: 'test', data: () => ({ density: 50 }) }]
+        });
+        return vi.fn();
+    }),
+    doc: vi.fn(),
+    getDoc: vi.fn(),
+    setDoc: vi.fn(),
+    updateDoc: vi.fn(),
+    addDoc: vi.fn(() => Promise.resolve({ id: 'new-id' })),
+    getDocs: vi.fn(() => Promise.resolve({
+        docs: [{ data: () => ({ density: 50 }) }]
+    })),
+    query: vi.fn(),
+    where: vi.fn(),
+}));
 
 // Setup emulator connectivity if testing in environment with emulator
 // if (process.env.USE_FIREBASE_EMULATOR) {

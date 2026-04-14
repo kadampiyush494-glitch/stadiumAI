@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 import { Bell, X, ShieldAlert, Users, LogOut, Clock, CheckCircle2, Filter } from 'lucide-react';
 import { onForegroundMessage, NOTIFICATION_TYPES } from '../../lib/fcmService';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -15,7 +15,7 @@ const NotifIcon = ({ type }) => {
 export default function NotifCenter() {
   const [notifications, setNotifications] = useState([
      { id: 1, title: 'Welcome to StadiumAI', body: 'Enjoy the match! Stay updated with live crowd alerts.', type: 'GENERAL', timestamp: new Date(), read: false },
-     { id: 2, title: 'Zone C Congested', body: 'Concourse C is experiencing high traffic. We recommend Zone B.', type: NOTIFICATION_TYPES.CONGESTION_ALERT, timestamp: new Date(Date.now() - 300000), read: false }
+     { id: 2, title: 'Zone C Congested', body: 'Concourse C is experiencing high traffic. We recommend Zone B.', type: NOTIFICATION_TYPES.CONGESTION_ALERT, timestamp: new Date(), read: false }
   ]);
   const [isOpen, setIsOpen] = useState(false);
   const [filter, setFilter] = useState('ALL');

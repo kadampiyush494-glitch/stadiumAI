@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from "react";
 import { Home, Map as MapIcon, MessageSquare, DoorOpen, Bell, ChevronLeft, ChevronRight, Settings } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 

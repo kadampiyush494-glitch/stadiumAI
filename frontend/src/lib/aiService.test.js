@@ -6,7 +6,7 @@ describe('aiService', () => {
 
   beforeEach(() => {
     mockFetch = vi.fn();
-    global.fetch = mockFetch;
+    vi.stubGlobal('fetch', mockFetch);
     resetRateLimit();
     vi.useFakeTimers();
   });
