@@ -1,0 +1,51 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function isAdmin() {
+      return isAuthenticated() && request.auth.token.admin == true;
+    }
+
+    // User data restricted to owner
+    match /users/{userId} {
+      allow read, write: if isOwner(userId);
+    }
+
+    // Queue & Venue data: Read-only for all auth users
+    match /queues/{queueId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+    
+    match /venues/{venueId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+    
+    match /zones/{zoneId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    // Admin restricted data
+    match /system_logs/{logId} {
+      allow read, write: if isAdmin();
+    }
+    
+    // Rate limiting logic: checks if lastUpdate was at least 1s ago
+    // Users can only update their status once per second
+    match /users/{userId}/status/{statusId} {
+       allow create: if isOwner(userId) && 
+         (request.time > resource.data.lastUpdate + duration.value(1, 's'));
+    }
+  }
+}

@@ -7,6 +7,9 @@
   
   --font-sans: "DM Sans", sans-serif;
   --font-mono: "Space Mono", monospace;
+  
+  --focus-ring: 0 0 0 2px #0f172a, 0 0 0 5px #00d4ff;
+  --min-touch-target: 44px;
 }
 
 @layer base {
@@ -15,14 +18,54 @@
     background-color: var(--color-primary);
     color: white;
   }
-  
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-bold;
+
+  /* Accessible Focus Ring */
+  :focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+    outline-offset: 2px;
+  }
+
+  /* Minimum Touch Target */
+  button, a, [role="button"] {
+    min-width: 44px;
+    min-height: 44px;
   }
 }
 
-@layer utilities {
-  .glass-card {
-    @apply bg-primary/40 backdrop-blur-md border border-white/10 rounded-2xl shadow-xl;
+/* High Contrast Mode */
+.high-contrast {
+  --color-primary: #000000;
+  --color-secondary: #00ffff;
+  --color-accent: #ffff00;
+  filter: contrast(1.2);
+}
+
+.high-contrast * {
+  border-color: #ffffff !important;
+  color: #ffffff !important;
+}
+
+.high-contrast .bg-primary { background-color: #000 !important; }
+
+/* Skip Link */
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: 0;
+  @apply bg-secondary text-primary p-4 z-[9999] font-bold transition-all;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

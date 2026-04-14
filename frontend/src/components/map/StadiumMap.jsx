@@ -2,7 +2,15 @@ import React, { useRef, useEffect, useState, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { useGoogleMaps } from '../../hooks/useGoogleMaps';
 import { collection, onSnapshot, query } from 'firebase/firestore';
-import { db } from '../../lib/firebase'; // Assuming a firebase init file exists
+import { db } from '../../lib/firebase';
+import { Users, Info, X } from 'lucide-react';
+
+const STADIUM_ZONES = [
+  { id: 1, name: 'North Concourse', density: 45 },
+  { id: 2, name: 'South Entrance', density: 82 },
+  { id: 3, name: 'West Food Court', density: 60 },
+  { id: 4, name: 'East Plaza', density: 25 },
+];
 
 const darkMapStyle = [
   { elementType: "geometry", stylers: [{ color: "#0A0E1A" }] },
@@ -187,11 +195,83 @@ export default function StadiumMap({ onRouteAnnounce }) {
     });
   };
 
+  const [showDensityTable, setShowDensityTable] = useState(false);
+
   if (loadError) return <div className="text-red-500">Error loading maps: {loadError.message}</div>;
   if (!isLoaded) return <div className="h-full w-full flex items-center justify-center text-white/50 bg-primary animate-pulse">Loading Stadium Map...</div > ;
 
   return (
     <div className="relative w-full h-[500px] rounded-xl overflow-hidden glass-card">
+      {/* Map Content for Screen Readers */}
+      <div className="sr-only" aria-live="polite">
+        {activeWaitTimes.length > 0 ? `Current wait times: ${activeWaitTimes.join(', ')}` : ''}
+      </div>
+
+      {/* Accessibility Overlays */}
+      <div className="absolute top-4 right-4 z-10 flex flex-col space-y-2">
+        <button 
+           onClick={() => setShowDensityTable(!showDensityTable)}
+           className="p-3 bg-slate-900/90 text-white rounded-2xl border border-white/10 shadow-xl flex items-center space-x-2 text-xs font-bold uppercase tracking-wider hover:bg-slate-800 transition-all pointer-events-auto"
+           aria-expanded={showDensityTable}
+           aria-controls="density-table"
+        >
+           <Users size={16} className="text-cyan-400" />
+           <span>{showDensityTable ? 'Hide Density' : 'Show Density Table'}</span>
+        </button>
+        
+        <button 
+           className="p-3 bg-slate-900/90 text-white rounded-2xl border border-white/10 shadow-xl flex items-center justify-center text-xs font-bold hover:bg-slate-800 pointer-events-auto"
+           aria-label="Map Keyboard Shortcut Guide"
+           onClick={() => alert("Keyboard Map Controls:\n+ / - : Zoom\nArrows : Pan\nCtrl + / : Search Facilities")}
+        >
+           <Info size={16} />
+        </button>
+      </div>
+
+      {showDensityTable && (
+        <div 
+          id="density-table"
+          className="absolute inset-0 z-50 bg-slate-950 p-6 overflow-y-auto"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="density-title"
+        >
+           <div className="flex justify-between items-center mb-6">
+              <h2 id="density-title" className="text-xl font-black text-white">Zone Density Reports</h2>
+              <button 
+                onClick={() => setShowDensityTable(false)}
+                className="p-2 bg-white/5 rounded-full text-slate-400 hover:text-white"
+                aria-label="Close Density Table"
+              >
+                <X size={24} />
+              </button>
+           </div>
+           
+           <table className="w-full text-left border-collapse">
+              <thead className="text-slate-500 text-[10px] uppercase font-bold tracking-widest border-b border-white/5">
+                 <tr>
+                    <th className="pb-3 px-2">Zone Name</th>
+                    <th className="pb-3 px-2">Density</th>
+                    <th className="pb-3 px-2 text-right">Trend</th>
+                 </tr>
+              </thead>
+              <tbody className="text-slate-100 text-sm">
+                 {STADIUM_ZONES.map(zone => (
+                    <tr key={zone.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                       <td className="py-4 px-2 font-bold">{zone.name}</td>
+                       <td className="py-4 px-2">
+                          <span className={zone.density > 80 ? 'text-rose-400' : 'text-emerald-400'}>
+                             {zone.density}%
+                          </span>
+                       </td>
+                       <td className="py-4 px-2 text-right text-slate-500 font-mono">Stable</td>
+                    </tr>
+                 ))}
+              </tbody>
+           </table>
+        </div>
+      )}
+
       <div
         ref={mapRef}
         className="w-full h-full"
@@ -199,19 +279,6 @@ export default function StadiumMap({ onRouteAnnounce }) {
         aria-label="Interactive Stadium Map with real-time crowd heatmaps"
         tabIndex="0"
       />
-      
-      {/* Invisible aria-live region for accessibility announcements */}
-      <div aria-live="polite" className="sr-only">
-        {activeWaitTimes.map((wait, idx) => <span key={idx}>{wait}</span>)}
-      </div>
-      
-      {/* Provide an accessible trigger for test/demo purposes */}
-      <button 
-        className="sr-only focus:not-sr-only absolute top-4 left-4 bg-primary text-secondary p-2 rounded"
-        onClick={() => calculateRoute(STADIUM_CENTER, { lat: 37.7750, lng: -122.4190 })}
-      >
-        Calculate Route to Burger Stand
-      </button>
     </div>
   );
 }
