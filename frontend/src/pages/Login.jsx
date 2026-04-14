@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Card, CardHeader, CardTitle } from '../components/ui/Card';
+import GlassCard from '../components/ui/GlassCard';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { useStore } from '../store';
@@ -15,7 +15,6 @@ export function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    // Mock JWT Auth
     setTimeout(() => {
       login({ id: '1', name: 'Test User', email, role: 'fan' }, 'mock-jwt-token');
       setIsLoading(false);
@@ -24,38 +23,46 @@ export function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-primary p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle className="text-center text-3xl mb-2">Omni<span className="text-secondary">Flow</span></CardTitle>
-          <p className="text-center text-white/60 text-sm">Sign in to your smart stadium portal</p>
-        </CardHeader>
-        <form onSubmit={handleLogin} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-white/80 mb-1">Email</label>
+    <div className="min-h-screen flex items-center justify-center bg-[#0A0E1A] p-4 relative overflow-hidden">
+      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-cyan-400/10 blur-[120px] rounded-full" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-amber-500/10 blur-[120px] rounded-full" />
+      
+      <GlassCard className="w-full max-w-md p-8 md:p-12 space-y-8" delay={0.2}>
+        <div className="text-center space-y-2">
+          <h1 className="text-4xl font-black italic tracking-tighter uppercase">
+            Omni<span className="text-cyan-400">Flow</span>
+          </h1>
+          <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Smart Stadium OS</p>
+        </div>
+
+        <form onSubmit={handleLogin} className="space-y-6">
+          <div className="space-y-2">
+            <label className="text-[10px] font-black uppercase tracking-widest text-slate-300 ml-1">Terminal ID (Email)</label>
             <Input 
               type="email" 
               value={email} 
               onChange={e => setEmail(e.target.value)} 
-              placeholder="fan@omniflow.com"
+              className="bg-white/5 border-white/5 rounded-2xl h-14"
+              placeholder="fan@omniflow.io"
               required 
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-white/80 mb-1">Password</label>
+          <div className="space-y-2">
+            <label className="text-[10px] font-black uppercase tracking-widest text-slate-300 ml-1">Secure Key (Password)</label>
             <Input 
               type="password" 
               value={password} 
               onChange={e => setPassword(e.target.value)} 
+              className="bg-white/5 border-white/5 rounded-2xl h-14"
               placeholder="••••••••"
               required 
             />
           </div>
-          <Button type="submit" variant="accent" className="w-full" isLoading={isLoading}>
-            Sign In
+          <Button type="submit" variant="accent" className="w-full h-14 rounded-2xl font-black uppercase tracking-widest shadow-xl shadow-cyan-400/20" isLoading={isLoading}>
+            Initialize Session
           </Button>
         </form>
-      </Card>
+      </GlassCard>
     </div>
   );
 }

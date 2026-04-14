@@ -1,71 +1,88 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap');
 @import "tailwindcss";
-
-@theme {
-  --color-primary: #0A0E1A;     /* Deep Navy */
-  --color-secondary: #00D4FF;   /* Electric Blue */
-  --color-accent: #FF8C00;      /* Amber Accent */
-  
-  --font-sans: "DM Sans", sans-serif;
-  --font-mono: "Space Mono", monospace;
-  
-  --focus-ring: 0 0 0 2px #0f172a, 0 0 0 5px #00d4ff;
-  --min-touch-target: 44px;
-}
+@import "./styles/tokens.css";
 
 @layer base {
-  body {
-    @apply bg-primary text-white font-sans antialiased;
-    background-color: var(--color-primary);
-    color: white;
-  }
-
-  /* Accessible Focus Ring */
-  :focus-visible {
-    outline: none;
-    box-shadow: var(--focus-ring);
-    outline-offset: 2px;
-  }
-
-  /* Minimum Touch Target */
-  button, a, [role="button"] {
-    min-width: 44px;
-    min-height: 44px;
+  * {
+    @apply border-white/10;
+    transition: all var(--transition-micro);
   }
 }
 
-/* High Contrast Mode */
-.high-contrast {
-  --color-primary: #000000;
-  --color-secondary: #00ffff;
-  --color-accent: #ffff00;
-  filter: contrast(1.2);
+@layer components {
+  .glass-panel {
+    background: var(--color-glass);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    @apply rounded-[--radius-lg] overflow-hidden;
+  }
+
+  .glow-hover {
+    position: relative;
+  }
+  .glow-hover::after {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    background: linear-gradient(45deg, var(--color-primary), transparent, var(--color-accent));
+    z-index: -1;
+    opacity: 0;
+    transition: opacity var(--transition-micro);
+    @apply rounded-[--radius-lg] blur-lg;
+  }
+  .glow-hover:hover::after {
+    opacity: 0.3;
+  }
+
+  .shimmer {
+    background: linear-gradient(
+      90deg, 
+      rgba(255,255,255,0) 0%, 
+      rgba(255,255,255,0.05) 50%, 
+      rgba(255,255,255,0) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+
+  @keyframes shimmer {
+    from { background-position: 200% 0; }
+    to { background-position: -200% 0; }
+  }
+
+  .pulse-scale {
+    animation: pulse 2s infinite ease-in-out;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.05); opacity: 0.8; }
+  }
+
+  .flash {
+    animation: flash-frame 1s ease-out;
+  }
+
+  @keyframes flash-frame {
+    0% { background-color: var(--color-primary); opacity: 0.5; }
+    100% { background-color: transparent; opacity: 1; }
+  }
 }
 
-.high-contrast * {
-  border-color: #ffffff !important;
-  color: #ffffff !important;
+/* Panel entrance stagger */
+.panel-enter {
+  animation: slide-up var(--transition-panel) forwards;
+  opacity: 0;
 }
 
-.high-contrast .bg-primary { background-color: #000 !important; }
-
-/* Skip Link */
-.skip-link {
-  position: absolute;
-  top: -100px;
-  left: 0;
-  @apply bg-secondary text-primary p-4 z-[9999] font-bold transition-all;
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-.skip-link:focus {
-  top: 0;
-}
-
-/* Reduced Motion */
 @media (prefers-reduced-motion: reduce) {
-  *, ::before, ::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
+  * {
+    animation: none !important;
+    transition: none !important;
   }
 }
